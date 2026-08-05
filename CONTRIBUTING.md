@@ -22,7 +22,7 @@ the approach before you invest time in it.
 
 ## Development setup
 
-Prerequisites: Node 20+.
+Prerequisites: Node 22+ (wrangler's minimum).
 
 ```sh
 npm install

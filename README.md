@@ -43,7 +43,7 @@ Peec-shaped exports for downstream content tooling — see
 
 ## Quickstart
 
-Prerequisites: a Cloudflare account, Node 20+, and API keys for Perplexity,
+Prerequisites: a Cloudflare account, Node 22+, and API keys for Perplexity,
 OpenAI (Domain classifier + calibration), Gemini, and cloro.dev (paid plan —
 see above).
 
