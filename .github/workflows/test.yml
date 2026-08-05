@@ -15,5 +15,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run typecheck
+      # npm test builds first; typecheck needs dist/server to exist
       - run: npm test
+      - run: npm run typecheck
