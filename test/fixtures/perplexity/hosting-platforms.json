@@ -1,0 +1,32 @@
+{
+  "id": "f2c5a1b0-0d4e-4a7e-9c1f-3b8f6c2a9d11",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "For most new podcasters, Transistor is the strongest all-round choice thanks to unlimited shows on every plan. Buzzsprout is the friendliest option for beginners, with excellent onboarding. Castos stands out if you run a WordPress site, since it pairs with the Seriously Simple Podcasting plugin and offers private podcasting. Captivate is worth a look for marketers who want built-in growth tools."
+      }
+    }
+  ],
+  "search_results": [
+    { "title": "Best podcast hosting platforms in 2026", "url": "https://www.techradar.com/best/best-podcast-hosting" },
+    { "title": "Transistor pricing", "url": "https://transistor.fm/pricing/" },
+    { "title": "Which host do you use?", "url": "https://www.reddit.com/r/podcasting/comments/1a2b3c/which_host/" },
+    { "title": "Podcast hosting megathread", "url": "https://old.reddit.com/r/podcasting/comments/9z8y7x/megathread/" },
+    { "title": "Castos private podcasting", "url": "https://castos.com/private-podcasting/" }
+  ],
+  "citations": [
+    "https://www.techradar.com/best/best-podcast-hosting",
+    "https://transistor.fm/pricing/",
+    "https://www.reddit.com/r/podcasting/comments/1a2b3c/which_host/",
+    "https://old.reddit.com/r/podcasting/comments/9z8y7x/megathread/",
+    "https://castos.com/private-podcasting/"
+  ],
+  "search_queries": ["best podcast hosting platforms 2026", "podcast hosting comparison unlimited shows"],
+  "usage": { "prompt_tokens": 14, "completion_tokens": 96, "total_tokens": 110 }
+}

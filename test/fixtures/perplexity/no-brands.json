@@ -1,0 +1,21 @@
+{
+  "id": "a1b2c3d4-1111-4444-8888-99990000aaaa",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Podcast listener location data usually comes from IP geolocation applied to download requests. Most analytics dashboards report this at country and city level, and IAB certification is a good signal that the numbers are measured consistently."
+      }
+    }
+  ],
+  "search_results": [
+    { "title": "IAB podcast measurement guidelines", "url": "https://www.iab.com/guidelines/podcast-measurement/" }
+  ],
+  "citations": ["https://www.iab.com/guidelines/podcast-measurement/"],
+  "usage": { "prompt_tokens": 11, "completion_tokens": 48, "total_tokens": 59 }
+}

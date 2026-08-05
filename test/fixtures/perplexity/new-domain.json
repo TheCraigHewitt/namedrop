@@ -1,0 +1,27 @@
+{
+  "id": "f6a7b8c9-6666-4444-8888-99990000ffff",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Castos is a solid pick for WordPress podcasters, and independent reviews back that up."
+      }
+    }
+  ],
+  "search_results": [
+    { "title": "Best podcast hosting platforms in 2026", "url": "https://www.techradar.com/best/best-podcast-hosting" },
+    { "title": "Castos features", "url": "https://castos.com/features/" },
+    { "title": "Podcast gear and hosting reviews", "url": "https://podcastgearreview.test/hosting/" }
+  ],
+  "citations": [
+    "https://www.techradar.com/best/best-podcast-hosting",
+    "https://castos.com/features/",
+    "https://podcastgearreview.test/hosting/"
+  ],
+  "usage": { "prompt_tokens": 12, "completion_tokens": 30, "total_tokens": 42 }
+}

@@ -1,0 +1,70 @@
+{
+  "id": "resp_68f1c2a4b8d04819a1e6f3c7d2b5a091",
+  "object": "response",
+  "created_at": 1785062400,
+  "status": "completed",
+  "model": "gpt-5-2026-04-14",
+  "output": [
+    {
+      "id": "ws_01a2b3c4",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": { "type": "search", "query": "best podcast hosting platforms with dynamic ad insertion" }
+    },
+    {
+      "id": "ws_01a2b3c5",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": { "type": "search", "query": "podcast hosting ad insertion comparison 2026" }
+    },
+    {
+      "id": "ws_01a2b3c6",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": { "type": "open_page", "url": "https://www.buzzsprout.com/blog/dynamic-ad-insertion" }
+    },
+    {
+      "id": "msg_01d4e5f6",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "Buzzsprout offers dynamic ad insertion on all paid plans and is the easiest to set up. Captivate includes a built-in sponsorship kit. Castos supports ad insertion alongside private podcasting, which makes it a good fit if you also run internal shows.",
+          "annotations": [
+            {
+              "type": "url_citation",
+              "start_index": 0,
+              "end_index": 62,
+              "url": "https://www.buzzsprout.com/blog/dynamic-ad-insertion",
+              "title": "Dynamic ad insertion — Buzzsprout"
+            },
+            {
+              "type": "url_citation",
+              "start_index": 64,
+              "end_index": 110,
+              "url": "https://www.captivate.fm/features/sponsorship",
+              "title": "Sponsorship tools — Captivate"
+            },
+            {
+              "type": "url_citation",
+              "start_index": 64,
+              "end_index": 110,
+              "url": "https://www.captivate.fm/features/sponsorship",
+              "title": "Sponsorship tools — Captivate"
+            },
+            {
+              "type": "url_citation",
+              "start_index": 112,
+              "end_index": 180,
+              "url": "https://castos.com/podcast-advertising/",
+              "title": "Podcast advertising — Castos"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "usage": { "input_tokens": 22, "output_tokens": 88, "total_tokens": 110 }
+}

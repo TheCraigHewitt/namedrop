@@ -1,0 +1,19 @@
+{
+  "id": "b2c3d4e5-2222-4444-8888-99990000bbbb",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Castos and Libsyn both support private podcast feeds for internal or paid audiences, and either will work for a small team."
+      }
+    }
+  ],
+  "search_results": [],
+  "citations": [],
+  "usage": { "prompt_tokens": 12, "completion_tokens": 27, "total_tokens": 39 }
+}

@@ -1,0 +1,83 @@
+---
+import { STALE_AFTER_HOURS, type CollectionHealth } from '../lib/queries/health'
+import { SURFACE_LABELS } from '../lib/types'
+
+interface Props {
+  health: CollectionHealth
+}
+const { health } = Astro.props
+
+const hours = health.hoursSinceLastOk
+const ago =
+  hours === null ? 'never' : hours < 1 ? 'less than an hour ago' : hours < 48 ? `${Math.floor(hours)} hours ago` : `${Math.floor(hours / 24)} days ago`
+
+const state = health.isStale ? 'stale' : health.failedRuns > 0 ? 'degraded' : 'ok'
+
+// Naming the dark Surfaces is the whole point: a Surface that stops collecting
+// looks like ordinary sparseness in every other number on the dashboard.
+const stale = health.staleSurfaces.map((surface) => SURFACE_LABELS[surface]).join(', ')
+---
+
+<a href="/health" class:list={['banner', state]} data-health={state}>
+  <span class="dot"></span>
+  {
+    health.isStale ? (
+      <span>
+        <strong>Collection is stale</strong> — no Runs from {stale} in over {STALE_AFTER_HOURS} hours.
+      </span>
+    ) : (
+      <span>
+        Last collection {ago}: {health.okRuns} Runs across {health.surfaces.length} Surfaces
+        {health.failedRuns > 0 && <strong> · {health.failedRuns} failed</strong>}.
+      </span>
+    )
+  }
+</a>
+
+<style>
+  .banner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+    color: var(--ink-dim);
+    font-size: 0.9rem;
+  }
+  .banner:hover {
+    text-decoration: none;
+    border-color: var(--ink-dim);
+  }
+  .banner strong {
+    color: var(--ink);
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .ok .dot {
+    background: var(--ok);
+  }
+  .degraded .dot {
+    background: var(--warn);
+  }
+  .degraded {
+    border-color: color-mix(in srgb, var(--warn) 45%, var(--line));
+  }
+  .stale {
+    border-color: var(--bad);
+    background: color-mix(in srgb, var(--bad) 12%, var(--panel));
+    color: var(--ink);
+  }
+  .stale .dot {
+    background: var(--bad);
+  }
+  .stale strong {
+    color: var(--bad);
+  }
+</style>

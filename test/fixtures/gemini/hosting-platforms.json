@@ -1,0 +1,51 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "role": "model",
+        "parts": [
+          { "text": "For built-in ad insertion, Podbean and Buzzsprout both include ad marketplaces. " },
+          { "text": "Castos supports ad insertion and is often recommended for WordPress-based shows." }
+        ]
+      },
+      "finishReason": "STOP",
+      "groundingMetadata": {
+        "webSearchQueries": [
+          "podcast platforms with built-in ad insertion",
+          "podcast ad marketplace hosting comparison"
+        ],
+        "groundingChunks": [
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG7xK2mNp9",
+              "title": "techradar.com"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFa3vB8dQ1",
+              "title": "podbean.com"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHc5wD2eR4",
+              "title": "www.techradar.com"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://castos.com/podcast-advertising/",
+              "title": "Podcast advertising — Castos"
+            }
+          }
+        ],
+        "groundingSupports": [
+          { "segment": { "startIndex": 0, "endIndex": 78, "text": "For built-in ad insertion" }, "groundingChunkIndices": [0, 1] }
+        ]
+      }
+    }
+  ],
+  "modelVersion": "gemini-2.5-flash",
+  "usageMetadata": { "promptTokenCount": 18, "candidatesTokenCount": 41, "totalTokenCount": 59 }
+}

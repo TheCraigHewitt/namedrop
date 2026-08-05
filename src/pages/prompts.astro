@@ -1,0 +1,157 @@
+---
+import { env } from 'cloudflare:workers'
+import FilterBar from '../components/FilterBar.astro'
+import Layout from '../layouts/Layout.astro'
+import { SELF_BRAND } from '../lib/config'
+import { filterQuery, parseFilters } from '../lib/filters'
+import { listTopics } from '../lib/queries/config'
+import { promptMetrics, type PromptMetrics } from '../lib/queries/metrics'
+import { ACTIVE_SURFACES } from '../lib/surfaces'
+
+const filters = parseFilters(Astro.url)
+
+const SORTS = {
+  topic: (a: PromptMetrics, b: PromptMetrics) => a.topicName.localeCompare(b.topicName) || a.promptId.localeCompare(b.promptId),
+  visibility: (a: PromptMetrics, b: PromptMetrics) => a.selfVisibility - b.selfVisibility,
+  sov: (a: PromptMetrics, b: PromptMetrics) => a.selfShareOfVoice - b.selfShareOfVoice,
+  position: (a: PromptMetrics, b: PromptMetrics) => (a.selfPosition ?? Infinity) - (b.selfPosition ?? Infinity),
+  runs: (a: PromptMetrics, b: PromptMetrics) => a.runs - b.runs,
+} as const
+type SortKey = keyof typeof SORTS
+
+const params = Astro.url.searchParams
+const sort = (Object.keys(SORTS).includes(params.get('sort') ?? '') ? params.get('sort') : 'visibility') as SortKey
+// Ascending by self-Brand Visibility is the content-targeting view, so it is the default.
+const direction = params.get('dir') === 'desc' ? 'desc' : 'asc'
+
+const [prompts, topics] = await Promise.all([promptMetrics(env.DB, filters, SELF_BRAND.id), listTopics(env.DB)])
+
+const sorted = [...prompts].sort((a, b) => (direction === 'asc' ? SORTS[sort](a, b) : SORTS[sort](b, a)))
+
+const sortLink = (key: SortKey) => {
+  const next = new URLSearchParams(Astro.url.search)
+  next.set('sort', key)
+  next.set('dir', sort === key && direction === 'asc' ? 'desc' : 'asc')
+  return `?${next.toString()}`
+}
+const arrow = (key: SortKey) => (sort !== key ? '' : direction === 'asc' ? ' ↑' : ' ↓')
+
+const percent = (value: number) => `${(value * 100).toFixed(1)}%`
+const withRuns = sorted.filter((prompt) => prompt.runs > 0).length
+---
+
+<Layout
+  title="Prompts"
+  subtitle={`${prompts.length} active Prompts, ${withRuns} with Runs from ${filters.from} to ${filters.to}. Sorted by ${sort} ${direction}.`}
+>
+  <FilterBar filters={filters} surfaces={ACTIVE_SURFACES} topics={topics} />
+
+  <div class="topic-filter">
+    <a href={filterQuery(filters, { topic: null })} class:list={['chip', { on: !filters.topicId }]}>All Topics</a>
+    {
+      topics.map((topic) => (
+        <a
+          href={filterQuery(filters, { topic: topic.id })}
+          class:list={['chip', { on: filters.topicId === topic.id }]}
+          data-topic-filter={topic.id}
+        >
+          {topic.name}
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th><a href={sortLink('topic')}>Topic{arrow('topic')}</a></th>
+          <th>Prompt</th>
+          <th class="num"><a href={sortLink('visibility')}>{SELF_BRAND.name} Visibility{arrow('visibility')}</a></th>
+          <th class="num"><a href={sortLink('position')}>Avg Position{arrow('position')}</a></th>
+          <th class="num"><a href={sortLink('sov')}>Share of Voice{arrow('sov')}</a></th>
+          <th>Brands mentioned</th>
+          <th class="num"><a href={sortLink('runs')}>Runs{arrow('runs')}</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          sorted.map((prompt) => (
+            <tr data-prompt={prompt.promptId} class:list={[{ invisible: prompt.runs > 0 && prompt.selfVisibility === 0 }]}>
+              <td class="muted small nowrap">{prompt.topicName}</td>
+              <td>{prompt.promptText}</td>
+              <td class="num" data-metric="visibility">
+                {prompt.runs === 0 ? '—' : percent(prompt.selfVisibility)}
+              </td>
+              <td class="num" data-metric="position">
+                {prompt.selfPosition === null ? '—' : prompt.selfPosition.toFixed(2)}
+              </td>
+              <td class="num" data-metric="sov">
+                {prompt.runs === 0 ? '—' : percent(prompt.selfShareOfVoice)}
+              </td>
+              <td data-metric="brands">
+                {prompt.brands.length === 0 ? (
+                  <span class="muted small">none</span>
+                ) : (
+                  prompt.brands.map((brand) => (
+                    <span class:list={['tag', { self: brand.isSelf }]}>{brand.name}</span>
+                  ))
+                )}
+              </td>
+              <td class="num muted" data-metric="runs">
+                {prompt.runs}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <style>
+    .topic-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: -0.75rem 0 1.25rem;
+    }
+    .chip {
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--ink-dim);
+      font-size: 0.82rem;
+    }
+    .chip:hover {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .chip.on {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #06131f;
+      font-weight: 600;
+    }
+    th a {
+      color: inherit;
+    }
+    th a:hover {
+      color: var(--ink);
+    }
+    /* Prompts where the self Brand never appears are the content-targeting list. */
+    tr.invisible td[data-metric='visibility'] {
+      color: var(--bad);
+      font-weight: 600;
+    }
+    td .tag {
+      margin-right: 0.25rem;
+    }
+    .small {
+      font-size: 0.8rem;
+    }
+    .nowrap {
+      white-space: nowrap;
+    }
+  </style>
+</Layout>

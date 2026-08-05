@@ -1,0 +1,50 @@
+{
+  "id": "resp_80b3e4c6da26a031c3a8b5e9f4d7c213",
+  "object": "response",
+  "created_at": 1785062400,
+  "status": "completed",
+  "model": "gpt-5-2026-04-14",
+  "output": [
+    {
+      "id": "ws_03c4d5e6",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "podcast hosting recommendations"
+      }
+    },
+    {
+      "id": "msg_03c4d5e7",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "Transistor and Buzzsprout are the usual recommendations, with Castos a strong choice for WordPress publishers.",
+          "annotations": [
+            {
+              "type": "url_citation",
+              "start_index": 0,
+              "end_index": 60,
+              "url": "https://transistor.fm/",
+              "title": "Transistor"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 26,
+    "total_tokens": 38,
+    "output_tokens_details": {
+      "reasoning_tokens": 18
+    },
+    "input_tokens_details": {
+      "cached_tokens": 4
+    }
+  }
+}

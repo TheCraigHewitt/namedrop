@@ -1,0 +1,156 @@
+---
+import { env } from 'cloudflare:workers'
+import HealthBanner from '../components/HealthBanner.astro'
+import Layout from '../layouts/Layout.astro'
+import { collectionHealth, STALE_AFTER_HOURS, sweepStatus } from '../lib/queries/health'
+import { SURFACE_LABELS, type SurfaceId } from '../lib/types'
+
+const health = await collectionHealth(env.DB)
+
+const { results: sweeps } = await env.DB.prepare(
+  `SELECT id, started_at, completed_at, status, ok_count, failed_count, surface
+   FROM sweeps ORDER BY started_at DESC LIMIT 21`,
+).all<{
+  id: string
+  started_at: string
+  completed_at: string | null
+  status: string
+  ok_count: number
+  failed_count: number
+  surface: string | null
+}>()
+---
+
+<Layout
+  title="Collection health"
+  subtitle={`Each Surface collects daily from 07:00 UTC on its own schedule. Stale after ${STALE_AFTER_HOURS} hours.`}
+>
+  <HealthBanner health={health} />
+
+  <div class="panel">
+    <h2>Coverage by Surface</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Surface</th>
+          <th>Last collected</th>
+          <th class="num">Collected</th>
+          <th class="num">Failed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          health.surfaces.map((coverage) => (
+            <tr data-surface-health={coverage.surface} data-stale={String(coverage.isStale)}>
+              <td class="nowrap">{SURFACE_LABELS[coverage.surface]}</td>
+              <td class="nowrap">
+                {coverage.lastOkAt ? (
+                  <span class:list={{ bad: coverage.isStale }}>{coverage.lastOkAt}</span>
+                ) : (
+                  <span class="bad">never</span>
+                )}
+              </td>
+              <td class="num">{coverage.okRuns}</td>
+              <td class="num">{coverage.failedRuns}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>
+      Failed Runs <span class="muted">· last 7 days</span>
+    </h2>
+    {
+      health.recentFailures.length === 0 ? (
+        <p class="empty" data-failures="0">
+          No failed Runs. Every Prompt reached every Surface.
+        </p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Surface</th>
+              <th>Prompt</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            {health.recentFailures.map((failure) => (
+              <tr data-failure={failure.id}>
+                <td class="nowrap">{failure.runDate}</td>
+                <td class="nowrap">{SURFACE_LABELS[failure.surface]}</td>
+                <td>{failure.promptText}</td>
+                <td class="error">{failure.error}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )
+    }
+  </div>
+
+  <div class="panel">
+    <h2>Recent sweeps</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Started</th>
+          <th>Surface</th>
+          <th>Status</th>
+          <th class="num">Collected</th>
+          <th class="num">Failed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          sweeps.map((sweep) => {
+            const status = sweepStatus(sweep)
+            return (
+              <tr data-sweep={sweep.id}>
+                <td class="nowrap">{sweep.started_at}</td>
+                {/* Sweeps recorded before collection was split per Surface covered all three. */}
+                <td class="nowrap">{sweep.surface ? (SURFACE_LABELS[sweep.surface as SurfaceId] ?? sweep.surface) : 'all'}</td>
+                <td>
+                  <span class:list={['tag', status]}>{status}</span>
+                </td>
+                <td class="num">{sweep.ok_count}</td>
+                <td class="num">{sweep.failed_count}</td>
+              </tr>
+            )
+          })
+        }
+      </tbody>
+    </table>
+    {sweeps.length === 0 && <p class="empty">No sweeps recorded yet.</p>}
+  </div>
+
+  <style>
+    .error {
+      color: var(--bad);
+      font-size: 0.85rem;
+    }
+    .nowrap {
+      white-space: nowrap;
+    }
+    .tag.partial {
+      border-color: var(--warn);
+      color: var(--warn);
+    }
+    .tag.failed,
+    .tag.truncated {
+      border-color: var(--bad);
+      color: var(--bad);
+    }
+    .bad {
+      color: var(--bad);
+    }
+    .tag.ok {
+      border-color: var(--ok);
+      color: var(--ok);
+    }
+  </style>
+</Layout>

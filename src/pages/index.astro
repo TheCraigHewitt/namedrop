@@ -1,0 +1,118 @@
+---
+import { env } from 'cloudflare:workers'
+import FilterBar from '../components/FilterBar.astro'
+import HealthBanner from '../components/HealthBanner.astro'
+import TrendChart from '../components/TrendChart.astro'
+import Layout from '../layouts/Layout.astro'
+import { parseFilters, priorPeriod } from '../lib/filters'
+import { brandLeaderboard, runCount, visibilityTrend } from '../lib/queries/metrics'
+import { collectionHealth } from '../lib/queries/health'
+import { listTopics } from '../lib/queries/config'
+import { ACTIVE_SURFACES } from '../lib/surfaces'
+
+const filters = parseFilters(Astro.url)
+const prior = priorPeriod(filters)
+
+const [leaderboard, trend, topics, runs, health] = await Promise.all([
+  brandLeaderboard(env.DB, filters, prior),
+  visibilityTrend(env.DB, filters),
+  listTopics(env.DB),
+  runCount(env.DB, filters),
+  collectionHealth(env.DB),
+])
+
+const brands = leaderboard.map((entry) => ({ id: entry.brandId, name: entry.name, isSelf: entry.isSelf }))
+
+const percent = (value: number) => `${(value * 100).toFixed(1)}%`
+const signedPercent = (value: number | null) => (value === null ? '—' : `${value >= 0 ? '+' : ''}${(value * 100).toFixed(1)}pp`)
+const position = (value: number | null) => (value === null ? '—' : value.toFixed(2))
+// A Position delta improves when the number goes down, so the sign is flipped for reading.
+const signedPosition = (value: number | null) => (value === null ? '—' : `${value >= 0 ? '+' : ''}${value.toFixed(2)}`)
+
+const deltaClass = (value: number | null, lowerIsBetter = false) =>
+  value === null || value === 0 ? 'flat' : (value > 0) !== lowerIsBetter ? 'up' : 'down'
+---
+
+<Layout
+  title="Overview"
+  subtitle={`${runs} Runs from ${filters.from} to ${filters.to}, compared with ${prior.from} to ${prior.to}.`}
+>
+  <HealthBanner health={health} />
+
+  <FilterBar filters={filters} surfaces={ACTIVE_SURFACES} topics={topics} />
+
+  <TrendChart points={trend} brands={brands} window={filters.window} />
+
+  <div class="panel">
+    <h2>Brand leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Brand</th>
+          <th class="num">Visibility</th>
+          <th class="num">Δ</th>
+          <th class="num">Share of Voice</th>
+          <th class="num">Δ</th>
+          <th class="num">Avg Position</th>
+          <th class="num">Δ</th>
+          <th class="num">Mentions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          leaderboard.map((entry) => (
+            <tr data-brand={entry.brandId} class:list={[{ self: entry.isSelf }]}>
+              <td>
+                {entry.name}
+                {entry.isSelf && <span class="tag self">you</span>}
+              </td>
+              <td class="num" data-metric="visibility">
+                {percent(entry.visibility)}
+              </td>
+              <td class:list={['num', 'delta', deltaClass(entry.visibilityDelta)]} data-metric="visibility-delta">
+                {signedPercent(entry.visibilityDelta)}
+              </td>
+              <td class="num" data-metric="sov">
+                {percent(entry.shareOfVoice)}
+              </td>
+              <td class:list={['num', 'delta', deltaClass(entry.shareOfVoiceDelta)]} data-metric="sov-delta">
+                {signedPercent(entry.shareOfVoiceDelta)}
+              </td>
+              <td class="num" data-metric="position">
+                {position(entry.position)}
+              </td>
+              <td class:list={['num', 'delta', deltaClass(entry.positionDelta, true)]} data-metric="position-delta">
+                {signedPosition(entry.positionDelta)}
+              </td>
+              <td class="num" data-metric="mentions">
+                {entry.mentions}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {runs === 0 && <p class="empty">No Runs in this period. Collection runs daily at 07:00 UTC.</p>}
+  </div>
+
+  <style>
+    tr.self td {
+      background: color-mix(in srgb, var(--self) 7%, transparent);
+    }
+    td.delta {
+      font-size: 0.85rem;
+    }
+    .delta.up {
+      color: var(--ok);
+    }
+    .delta.down {
+      color: var(--bad);
+    }
+    .delta.flat {
+      color: var(--ink-dim);
+    }
+    td .tag {
+      margin-left: 0.4rem;
+    }
+  </style>
+</Layout>

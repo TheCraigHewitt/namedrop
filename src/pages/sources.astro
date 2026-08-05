@@ -1,0 +1,173 @@
+---
+import { env } from 'cloudflare:workers'
+import FilterBar from '../components/FilterBar.astro'
+import Layout from '../layouts/Layout.astro'
+import { SELF_BRAND } from '../lib/config'
+import { parseFilters } from '../lib/filters'
+import { listTopics } from '../lib/queries/config'
+import { domainLeaderboard, domainTypeBreakdown, selfDomainRank } from '../lib/queries/sources'
+import { ACTIVE_SURFACES } from '../lib/surfaces'
+
+const filters = parseFilters(Astro.url)
+
+const [domains, breakdown, self, topics] = await Promise.all([
+  domainLeaderboard(env.DB, filters),
+  domainTypeBreakdown(env.DB, filters),
+  selfDomainRank(env.DB, filters),
+  listTopics(env.DB),
+])
+
+const TYPE_COLOURS: Record<string, string> = {
+  Corporate: '#4f9dff',
+  UGC: '#46c07a',
+  Editorial: '#c084fc',
+  Reference: '#38bdf8',
+  Institutional: '#f472b6',
+  Competitor: '#e5534b',
+  You: '#ffb84d',
+  Other: '#8b96a5',
+}
+
+const percent = (value: number) => `${(value * 100).toFixed(1)}%`
+---
+
+<Layout title="Sources" subtitle={`Domains cited across Runs from ${filters.from} to ${filters.to}.`}>
+  <FilterBar filters={filters} surfaces={ACTIVE_SURFACES} topics={topics} />
+
+  <div class="panel">
+    <h2>Domain Type mix</h2>
+    <div class="panel-body">
+      {
+        breakdown.length === 0 ? (
+          <p class="empty">No citations in this period yet.</p>
+        ) : (
+          <>
+            <div class="bar">
+              {breakdown.map((row) => (
+                <span
+                  class="segment"
+                  style={`width:${row.share * 100}%;background:${TYPE_COLOURS[row.domainType] ?? TYPE_COLOURS.Other}`}
+                  title={`${row.domainType}: ${percent(row.share)}`}
+                />
+              ))}
+            </div>
+            <div class="legend">
+              {breakdown.map((row) => (
+                <span class="key" data-type={row.domainType}>
+                  <i style={`background:${TYPE_COLOURS[row.domainType] ?? TYPE_COLOURS.Other}`} />
+                  {row.domainType}
+                  <b data-share>{percent(row.share)}</b>
+                  <span class="muted">({row.retrieved})</span>
+                </span>
+              ))}
+            </div>
+          </>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    self && (
+      <p class="self-rank" data-self-rank={self.rank}>
+        <strong>{self.domain}</strong> ranks <strong>#{self.rank}</strong> among cited Domains this period, with{' '}
+        {self.retrieved} citations.
+      </p>
+    )
+  }
+  {
+    !self && domains.length > 0 && (
+      <p class="self-rank muted" data-self-rank="none">
+        {SELF_BRAND.domains[0]} has not been cited in this period.
+      </p>
+    )
+  }
+
+  <div class="panel">
+    <h2>Domain leaderboard <span class="muted">· by retrieval count</span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Domain</th>
+          <th>Type</th>
+          <th class="num">Retrieved</th>
+          <th class="num">Retrieval rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          domains.map((row, index) => (
+            <tr data-domain={row.domain} class:list={[{ self: row.isSelf }]}>
+              <td class="num muted">{index + 1}</td>
+              <td>
+                {row.domain}
+                {row.isSelf && <span class="tag self">you</span>}
+              </td>
+              <td>
+                <span class="tag" style={`border-color:${TYPE_COLOURS[row.domainType] ?? TYPE_COLOURS.Other}`} data-type={row.domainType}>
+                  {row.domainType}
+                </span>
+              </td>
+              <td class="num" data-retrieved={row.retrieved}>
+                {row.retrieved}
+              </td>
+              <td class="num" data-rate>
+                {percent(row.retrievalRate)}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {domains.length === 0 && <p class="empty">No Sources cited in this period.</p>}
+  </div>
+
+  <style>
+    .bar {
+      display: flex;
+      height: 14px;
+      border-radius: 7px;
+      overflow: hidden;
+      background: var(--panel-2);
+    }
+    .segment {
+      display: block;
+      height: 100%;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      margin-top: 0.85rem;
+      font-size: 0.85rem;
+      color: var(--ink-dim);
+    }
+    .key {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .key i {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+    .key b {
+      color: var(--ink);
+    }
+    .self-rank {
+      margin: -0.5rem 0 1.5rem;
+    }
+    tr.self td {
+      background: color-mix(in srgb, var(--self) 9%, transparent);
+    }
+    tr.self td:nth-child(2) {
+      font-weight: 600;
+      color: var(--self);
+    }
+    td .tag {
+      margin-left: 0.4rem;
+    }
+  </style>
+</Layout>

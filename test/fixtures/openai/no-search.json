@@ -1,0 +1,23 @@
+{
+  "id": "resp_79a2d3b5c9e15920b2f7a4d8e3c6b102",
+  "object": "response",
+  "created_at": 1785062400,
+  "status": "completed",
+  "model": "gpt-5-2026-04-14",
+  "output": [
+    {
+      "id": "msg_02a3b4c5",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "Libsyn has been hosting podcasts since 2004 and remains a common choice for long-running shows.",
+          "annotations": []
+        }
+      ]
+    }
+  ],
+  "usage": { "input_tokens": 15, "output_tokens": 24, "total_tokens": 39 }
+}

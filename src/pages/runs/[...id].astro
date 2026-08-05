@@ -1,0 +1,148 @@
+---
+import { env } from 'cloudflare:workers'
+import Layout from '../../layouts/Layout.astro'
+import { getRun } from '../../lib/queries/runs'
+import { SURFACE_LABELS } from '../../lib/types'
+
+// Run ids contain colons (date:surface:prompt), so the rest parameter keeps them intact.
+const { id } = Astro.params
+const run = id ? await getRun(env.DB, decodeURIComponent(id)) : null
+
+if (!run) {
+  return new Response('Run not found', { status: 404 })
+}
+
+const surfaceLabel = SURFACE_LABELS[run.surface]
+---
+
+<Layout title="Run" subtitle={`${surfaceLabel} · ${run.runDate} · ${run.topicName}`}>
+  <div class="panel">
+    <h2>Prompt</h2>
+    <div class="panel-body">
+      <p class="prompt">{run.promptText}</p>
+      <div class="meta">
+        <span class="tag">{surfaceLabel}</span>
+        <span class="tag">{run.runDate}</span>
+        {run.model && <span class="tag">{run.model}</span>}
+        <span class:list={['tag', { failed: run.status === 'failed' }]}>{run.status}</span>
+      </div>
+    </div>
+  </div>
+
+  {
+    run.status === 'failed' ? (
+      <div class="panel">
+        <h2>Error</h2>
+        <div class="panel-body">
+          <pre data-error>{run.error}</pre>
+        </div>
+      </div>
+    ) : (
+      <>
+        <div class="panel">
+          <h2>
+            Brands mentioned <span class="muted">· in Position order</span>
+          </h2>
+          <div class="panel-body brands">
+            {run.brands.length === 0 ? (
+              <span class="muted">No tracked Brands were mentioned.</span>
+            ) : (
+              run.brands.map((brand) => (
+                <span class:list={['tag', { self: brand.isSelf }]} data-brand={brand.id}>
+                  {brand.position}. {brand.name}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Response</h2>
+          <div class="panel-body">
+            <div class="response" data-response>{run.responseText}</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>
+            Citations <span class="muted">· {run.sources.length}</span>
+          </h2>
+          {run.sources.length === 0 ? (
+            <p class="empty">This Surface returned no citations.</p>
+          ) : (
+            <table>
+              <tbody>
+                {run.sources.map((source) => (
+                  <tr data-source={source.ordinal}>
+                    <td class="num muted">{source.ordinal + 1}</td>
+                    <td>
+                      <a href={source.url} rel="noreferrer noopener nofollow" target="_blank">
+                        {source.title ?? source.url}
+                      </a>
+                    </td>
+                    <td class="nowrap" data-domain={source.domain}>
+                      {source.domain}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div class="panel">
+          <h2>
+            Fanouts <span class="muted">· what the Surface searched for</span>
+          </h2>
+          {run.fanouts.length === 0 ? (
+            <p class="empty">This Surface reported no search queries.</p>
+          ) : (
+            <ul class="fanouts">
+              {run.fanouts.map((query) => (
+                <li data-fanout>{query}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </>
+    )
+  }
+
+  <p><a href="/runs">← All Runs</a></p>
+
+  <style>
+    .prompt {
+      margin: 0 0 0.75rem;
+      font-size: 1.05rem;
+    }
+    .meta,
+    .brands {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .response {
+      white-space: pre-wrap;
+      line-height: 1.65;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      color: var(--bad);
+    }
+    .tag.failed {
+      border-color: var(--bad);
+      color: var(--bad);
+    }
+    .fanouts {
+      margin: 0;
+      padding: 1rem 1rem 1rem 2rem;
+    }
+    .fanouts li {
+      margin-bottom: 0.3rem;
+    }
+    .nowrap {
+      white-space: nowrap;
+    }
+  </style>
+</Layout>

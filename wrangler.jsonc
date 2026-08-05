@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "namedrop",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-04-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  // Cloudflare Access is the only thing protecting this app, and a policy on the
+  // main hostname does not cover per-version preview hostnames. Nothing here
+  // needs them, so there is exactly one route to protect.
+  "preview_urls": false,
+  "triggers": {
+    // Daily sweep from 07:00 UTC — after US overnight, before the team's morning.
+    // One Surface per schedule: a Cron Trigger is killed at 15 minutes of wall
+    // clock, and all three Surfaces in one firing does not fit. Spaced 20 minutes
+    // so two sweeps can never overlap. src/worker.ts maps each to its Surface.
+    "crons": ["0 7 * * *", "20 7 * * *", "40 7 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "namedrop",
+      "database_id": "PLACEHOLDER_SET_BY_WRANGLER_D1_CREATE",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "COLLECTION_ENABLED": "true"
+  }
+}

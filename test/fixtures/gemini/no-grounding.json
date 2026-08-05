@@ -1,0 +1,13 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "role": "model",
+        "parts": [{ "text": "Simplecast is generally aimed at networks and larger publishers rather than individual creators." }]
+      },
+      "finishReason": "STOP"
+    }
+  ],
+  "modelVersion": "gemini-2.5-flash",
+  "usageMetadata": { "promptTokenCount": 14, "candidatesTokenCount": 19, "totalTokenCount": 33 }
+}

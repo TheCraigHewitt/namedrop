@@ -1,0 +1,157 @@
+---
+import { env } from 'cloudflare:workers'
+import FilterBar from '../../components/FilterBar.astro'
+import Layout from '../../layouts/Layout.astro'
+import { parseFilters } from '../../lib/filters'
+import { listBrands, listTopics } from '../../lib/queries/config'
+import { listRuns } from '../../lib/queries/runs'
+import { ACTIVE_SURFACES } from '../../lib/surfaces'
+import { SURFACE_LABELS } from '../../lib/types'
+
+const filters = parseFilters(Astro.url)
+const brandId = Astro.url.searchParams.get('brand') || null
+
+const [{ runs, total }, brands, topics] = await Promise.all([
+  listRuns(env.DB, filters, { brandId }),
+  listBrands(env.DB),
+  listTopics(env.DB),
+])
+
+const selectedBrand = brands.find((brand) => brand.id === brandId)
+const truncated = total > runs.length
+
+const brandLink = (id: string | null) => {
+  const params = new URLSearchParams(Astro.url.search)
+  if (id) params.set('brand', id)
+  else params.delete('brand')
+  return `?${params.toString()}`
+}
+---
+
+<Layout
+  title="Runs"
+  subtitle={`What the assistants actually said — ${
+    truncated ? `showing ${runs.length} of ${total}` : total
+  } Runs${selectedBrand ? ` mentioning ${selectedBrand.name}` : ''}, ${filters.from} to ${filters.to}.`}
+>
+  <FilterBar filters={filters} surfaces={ACTIVE_SURFACES} topics={topics} />
+
+  <div class="brand-filter">
+    <span class="muted">Mentions</span>
+    <a href={brandLink(null)} class:list={['chip', { on: !brandId }]}>Any Brand</a>
+    {
+      brands.map((brand) => (
+        <a href={brandLink(brand.id)} class:list={['chip', { on: brandId === brand.id }]} data-brand-filter={brand.id}>
+          {brand.name}
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Surface</th>
+          <th>Prompt</th>
+          <th>Brands mentioned</th>
+          <th>Sources</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          runs.map((run) => (
+            <tr data-run={run.id}>
+              <td class="nowrap">{run.runDate}</td>
+              <td class="nowrap">{SURFACE_LABELS[run.surface]}</td>
+              <td>
+                <a href={`/runs/${run.id}`}>{run.promptText}</a>
+                <div class="muted small">{run.topicName}</div>
+              </td>
+              <td data-brands={run.brands.map((brand) => brand.id).join(',')}>
+                {run.status === 'failed' ? (
+                  <span class="tag failed">failed</span>
+                ) : run.brands.length === 0 ? (
+                  <span class="muted small">none</span>
+                ) : (
+                  run.brands.map((brand) => (
+                    <span class:list={['tag', { self: brand.isSelf }]}>
+                      {brand.position}. {brand.name}
+                    </span>
+                  ))
+                )}
+              </td>
+              <td data-sources={run.sourceCount}>
+                {run.domains.length === 0 ? (
+                  <span class="muted small">none</span>
+                ) : (
+                  <span class="domains">
+                    {run.domains.slice(0, 4).map((domain) => (
+                      <span class="tag">{domain}</span>
+                    ))}
+                    {run.domains.length > 4 && <span class="muted small">+{run.domains.length - 4}</span>}
+                  </span>
+                )}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {runs.length === 0 && <p class="empty">No Runs match these filters.</p>}
+  </div>
+
+  <style>
+    .brand-filter {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      margin: -0.75rem 0 1.25rem;
+    }
+    .brand-filter .muted {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.25rem;
+    }
+    .chip {
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--ink-dim);
+      font-size: 0.82rem;
+    }
+    .chip:hover {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .chip.on {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #06131f;
+      font-weight: 600;
+    }
+    td .tag {
+      margin-right: 0.25rem;
+    }
+    .domains {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      align-items: center;
+    }
+    .tag.failed {
+      border-color: var(--bad);
+      color: var(--bad);
+    }
+    .nowrap {
+      white-space: nowrap;
+    }
+    .small {
+      font-size: 0.8rem;
+    }
+  </style>
+</Layout>

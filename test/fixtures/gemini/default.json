@@ -1,0 +1,35 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "role": "model",
+        "parts": [
+          {
+            "text": "Buzzsprout, Transistor and Castos are all commonly recommended podcast hosts."
+          }
+        ]
+      },
+      "finishReason": "STOP",
+      "groundingMetadata": {
+        "webSearchQueries": [
+          "recommended podcast hosts"
+        ],
+        "groundingChunks": [
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQK9zL4nT7x",
+              "title": "buzzsprout.com"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "modelVersion": "gemini-2.5-flash",
+  "usageMetadata": {
+    "promptTokenCount": 11,
+    "candidatesTokenCount": 17,
+    "totalTokenCount": 28,
+    "thoughtsTokenCount": 9
+  }
+}

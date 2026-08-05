@@ -1,0 +1,19 @@
+{
+  "id": "e5f6a7b8-5555-4444-8888-99990000eeee",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Buzzsprout and Transistor are the two most commonly recommended podcast hosts, and Castos is a strong option if you publish through WordPress."
+      }
+    }
+  ],
+  "search_results": [{ "title": "Podcast hosting compared", "url": "https://www.buzzsprout.com/blog/podcast-hosting" }],
+  "citations": ["https://www.buzzsprout.com/blog/podcast-hosting"],
+  "usage": { "prompt_tokens": 10, "completion_tokens": 30, "total_tokens": 40 }
+}

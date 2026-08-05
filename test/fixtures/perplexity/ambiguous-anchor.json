@@ -1,0 +1,19 @@
+{
+  "id": "c3d4e5f6-3333-4444-8888-99990000cccc",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "To grow a show, publish episode pages with descriptive anchor text pointing at your episode archive, and anchor your promotion around one flagship episode per month. Podbean bundles some of this, and Castos handles the WordPress side well."
+      }
+    }
+  ],
+  "search_results": [{ "title": "Podcast SEO basics", "url": "https://podcasthosting.org/podcast-seo/" }],
+  "citations": ["https://podcasthosting.org/podcast-seo/"],
+  "usage": { "prompt_tokens": 13, "completion_tokens": 51, "total_tokens": 64 }
+}

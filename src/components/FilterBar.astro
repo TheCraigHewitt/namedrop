@@ -1,0 +1,97 @@
+---
+import type { Filters } from '../lib/filters'
+import { SURFACE_LABELS, type SurfaceId } from '../lib/types'
+
+interface Props {
+  filters: Filters
+  surfaces: SurfaceId[]
+  topics: { id: string; name: string }[]
+}
+const { filters, surfaces, topics } = Astro.props
+---
+
+<form class="filters" method="get" data-filters>
+  <label>
+    <span>From</span>
+    <input type="date" name="from" value={filters.from} />
+  </label>
+  <label>
+    <span>To</span>
+    <input type="date" name="to" value={filters.to} />
+  </label>
+  <label>
+    <span>Surface</span>
+    <select name="surface">
+      <option value="">All Surfaces</option>
+      {
+        surfaces.map((surface) => (
+          <option value={surface} selected={filters.surface === surface}>
+            {SURFACE_LABELS[surface]}
+          </option>
+        ))
+      }
+    </select>
+  </label>
+  <label>
+    <span>Topic</span>
+    <select name="topic">
+      <option value="">All Topics</option>
+      {
+        topics.map((topic) => (
+          <option value={topic.id} selected={filters.topicId === topic.id}>
+            {topic.name}
+          </option>
+        ))
+      }
+    </select>
+  </label>
+  <button type="submit">Apply</button>
+</form>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.5rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  span {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-dim);
+  }
+  input,
+  select {
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+    font: inherit;
+    font-size: 0.9rem;
+  }
+  button {
+    background: var(--accent);
+    color: #06131f;
+    border: none;
+    border-radius: 6px;
+    padding: 0.48rem 1rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover {
+    filter: brightness(1.1);
+  }
+</style>

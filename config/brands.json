@@ -1,0 +1,65 @@
+[
+  {
+    "id": "castos",
+    "name": "Castos",
+    "isSelf": true,
+    "domains": ["castos.com"],
+    "aliases": ["Castos", "castos.com"]
+  },
+  {
+    "id": "transistor",
+    "name": "Transistor",
+    "domains": ["transistor.fm"],
+    "aliases": ["Transistor.fm", { "text": "Transistor", "notFollowedBy": ["radio"] }]
+  },
+  {
+    "id": "buzzsprout",
+    "name": "Buzzsprout",
+    "domains": ["buzzsprout.com"],
+    "aliases": ["Buzzsprout", "Buzz Sprout"]
+  },
+  {
+    "id": "captivate",
+    "name": "Captivate",
+    "domains": ["captivate.fm"],
+    "aliases": [
+      "Captivate.fm",
+      {
+        "text": "Captivate",
+        "notFollowedBy": ["your", "their", "our", "an", "a", "the", "audiences", "audience", "listeners", "readers", "them"]
+      }
+    ]
+  },
+  {
+    "id": "podbean",
+    "name": "Podbean",
+    "domains": ["podbean.com"],
+    "aliases": ["Podbean", "Pod Bean"]
+  },
+  {
+    "id": "libsyn",
+    "name": "Libsyn",
+    "domains": ["libsyn.com"],
+    "aliases": ["Libsyn", "Liberated Syndication"]
+  },
+  {
+    "id": "simplecast",
+    "name": "Simplecast",
+    "domains": ["simplecast.com"],
+    "aliases": ["Simplecast", "Simple Cast"]
+  },
+  {
+    "id": "anchor",
+    "name": "Anchor",
+    "domains": ["anchor.fm"],
+    "aliases": [
+      "Anchor.fm",
+      "Spotify for Podcasters",
+      "Spotify for Creators",
+      {
+        "text": "Anchor",
+        "notFollowedBy": ["text", "tag", "tags", "link", "links", "point", "points", "store", "stores", "your", "their", "our", "the", "a", "an", "it", "content"]
+      }
+    ]
+  }
+]

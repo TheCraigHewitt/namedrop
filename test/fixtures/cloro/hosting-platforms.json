@@ -1,0 +1,42 @@
+{
+  "success": true,
+  "result": {
+    "text": "Buzzsprout offers dynamic ad insertion on all paid plans and is the easiest to set up. Captivate includes a built-in sponsorship kit. Castos supports ad insertion alongside private podcasting, which makes it a good fit if you also run internal shows.",
+    "model": "gpt-5-5",
+    "sources": [
+      {
+        "position": 1,
+        "url": "https://www.buzzsprout.com/blog/dynamic-ad-insertion?utm_source=chatgpt.com",
+        "label": "Dynamic ad insertion — Buzzsprout",
+        "description": "",
+        "footnote": false
+      },
+      {
+        "position": 2,
+        "url": "https://www.captivate.fm/sponsor-kit?utm_source=chatgpt.com",
+        "label": "Sponsorship kit — Captivate",
+        "description": "",
+        "footnote": false
+      },
+      {
+        "position": 3,
+        "url": "https://castos.com/podcast-advertising/?utm_source=chatgpt.com",
+        "label": "Podcast advertising — Castos",
+        "description": "",
+        "footnote": true
+      },
+      {
+        "position": 4,
+        "url": "https://www.buzzsprout.com/blog/dynamic-ad-insertion?utm_source=chatgpt.com",
+        "label": "Dynamic ad insertion — Buzzsprout",
+        "description": "",
+        "footnote": true
+      }
+    ],
+    "searchQueries": [
+      "best podcast hosting platforms with dynamic ad insertion",
+      "podcast hosting ad insertion comparison 2026"
+    ],
+    "citationPills": []
+  }
+}

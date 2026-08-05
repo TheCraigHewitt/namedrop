@@ -1,0 +1,144 @@
+---
+import type { TrendPoint } from '../lib/queries/metrics'
+
+interface Props {
+  points: TrendPoint[]
+  brands: { id: string; name: string; isSelf: boolean }[]
+  window: number
+}
+const { points, brands, window } = Astro.props
+
+const dates = [...new Set(points.map((point) => point.date))].sort()
+const byBrand = new Map(brands.map((brand) => [brand.id, [] as TrendPoint[]]))
+for (const point of points) byBrand.get(point.brandId)?.push(point)
+
+// The self Brand keeps a fixed, distinct colour; competitors cycle through the rest.
+const COMPETITOR_COLOURS = ['#4f9dff', '#46c07a', '#c084fc', '#f472b6', '#38bdf8', '#a3a3a3', '#fb923c']
+const colourFor = (brandId: string, index: number) =>
+  brands.find((brand) => brand.id === brandId)?.isSelf ? 'var(--self)' : COMPETITOR_COLOURS[index % COMPETITOR_COLOURS.length]!
+
+const W = 900
+const H = 260
+const PAD = { top: 12, right: 12, bottom: 26, left: 38 }
+
+const plotW = W - PAD.left - PAD.right
+const plotH = H - PAD.top - PAD.bottom
+
+const x = (index: number) => PAD.left + (dates.length <= 1 ? plotW / 2 : (index / (dates.length - 1)) * plotW)
+const y = (value: number) => PAD.top + plotH - value * plotH
+
+const lines = brands
+  .map((brand, index) => {
+    const series = (byBrand.get(brand.id) ?? []).sort((a, b) => a.date.localeCompare(b.date))
+    return {
+      brand,
+      colour: colourFor(brand.id, index),
+      hasData: series.some((point) => point.runs > 0),
+      points: series.map((point, i) => ({ ...point, cx: x(i), cy: y(point.visibility) })),
+    }
+  })
+  .filter((line) => line.points.length > 0)
+
+const gridLines = [0, 0.25, 0.5, 0.75, 1]
+const tickEvery = Math.max(1, Math.ceil(dates.length / 8))
+---
+
+<div class="panel">
+  <h2>Visibility over time <span class="muted">· {window}-day rolling</span></h2>
+  <div class="panel-body">
+    {
+      dates.length === 0 ? (
+        <p class="empty">No Runs in this period yet.</p>
+      ) : (
+        <>
+          <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Visibility per Brand over time" class="chart">
+            {gridLines.map((value) => (
+              <>
+                <line x1={PAD.left} x2={W - PAD.right} y1={y(value)} y2={y(value)} class="grid" />
+                <text x={PAD.left - 8} y={y(value) + 4} class="axis" text-anchor="end">
+                  {Math.round(value * 100)}%
+                </text>
+              </>
+            ))}
+            {dates.map((date, index) =>
+              index % tickEvery === 0 ? (
+                <text x={x(index)} y={H - 8} class="axis" text-anchor="middle">
+                  {date.slice(5)}
+                </text>
+              ) : null,
+            )}
+            {lines.map((line) => (
+              <g data-series={line.brand.id}>
+                <polyline
+                  fill="none"
+                  stroke={line.colour}
+                  stroke-width={line.brand.isSelf ? 2.75 : 1.5}
+                  points={line.points.map((point) => `${point.cx},${point.cy}`).join(' ')}
+                />
+                {line.points.map((point) => (
+                  <circle
+                    cx={point.cx}
+                    cy={point.cy}
+                    r={line.brand.isSelf ? 3 : 2}
+                    fill={line.colour}
+                    data-date={point.date}
+                    data-visibility={point.visibility.toFixed(4)}
+                  >
+                    <title>{`${line.brand.name} · ${point.date} · ${(point.visibility * 100).toFixed(1)}%`}</title>
+                  </circle>
+                ))}
+              </g>
+            ))}
+          </svg>
+
+          <div class="legend">
+            {lines.map((line) => (
+              <span class:list={['key', { self: line.brand.isSelf }]}>
+                <i style={`background:${line.colour}`} />
+                {line.brand.name}
+              </span>
+            ))}
+          </div>
+        </>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .chart {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .grid {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+  .axis {
+    fill: var(--ink-dim);
+    font-size: 11px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--ink-dim);
+  }
+  .key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .key.self {
+    color: var(--self);
+    font-weight: 600;
+  }
+  .key i {
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+  }
+</style>

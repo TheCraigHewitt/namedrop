@@ -1,0 +1,19 @@
+{
+  "id": "d4e5f6a7-4444-4444-8888-99990000dddd",
+  "model": "sonar",
+  "object": "chat.completion",
+  "created": 1785062400,
+  "choices": [
+    {
+      "index": 0,
+      "finish_reason": "stop",
+      "message": {
+        "role": "assistant",
+        "content": "Free options are limited: Anchor is the best known, having become Spotify for Podcasters, and Podbean has a free tier with ads. Castos does not have a free plan but offers a trial."
+      }
+    }
+  ],
+  "search_results": [{ "title": "Free podcast hosting compared", "url": "https://www.thepodosphere.com/free-hosting/" }],
+  "citations": ["https://www.thepodosphere.com/free-hosting/"],
+  "usage": { "prompt_tokens": 12, "completion_tokens": 44, "total_tokens": 56 }
+}

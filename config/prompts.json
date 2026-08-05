@@ -1,0 +1,58 @@
+[
+  {
+    "id": "podcast-distribution-software-01",
+    "topicId": "podcast-distribution-software",
+    "text": "Recommend an easy way to publish my audio shows everywhere.",
+    "intent": "transactional",
+    "branding": "non-branded"
+  },
+  {
+    "id": "wordpress-podcasting-plugins-01",
+    "topicId": "wordpress-podcasting-plugins",
+    "text": "Find me a WordPress plugin that handles both hosting and publishing.",
+    "intent": "transactional",
+    "branding": "non-branded"
+  },
+  {
+    "id": "podcast-analytics-tools-01",
+    "topicId": "podcast-analytics-tools",
+    "text": "How can I see where my podcast listeners are located?",
+    "intent": "informational",
+    "branding": "non-branded"
+  },
+  {
+    "id": "podcast-monetization-01",
+    "topicId": "podcast-monetization",
+    "text": "Find me a hosting service with built-in sponsorship tools.",
+    "intent": "transactional",
+    "branding": "non-branded"
+  },
+  {
+    "id": "podcast-analytics-tools-02",
+    "topicId": "podcast-analytics-tools",
+    "text": "Compare the accuracy of listener data across top podcast hosting providers.",
+    "intent": "informational",
+    "branding": "non-branded"
+  },
+  {
+    "id": "podcast-hosting-platforms-01",
+    "topicId": "podcast-hosting-platforms",
+    "text": "Show me podcast platforms with built-in ad insertion tools.",
+    "intent": "transactional",
+    "branding": "non-branded"
+  },
+  {
+    "id": "podcast-hosting-platforms-02",
+    "topicId": "podcast-hosting-platforms",
+    "text": "Recommend an easy podcast hosting platform.",
+    "intent": "transactional",
+    "branding": "non-branded"
+  },
+  {
+    "id": "private-podcast-hosting-services-01",
+    "topicId": "private-podcast-hosting-services",
+    "text": "Recommend a simple platform for hosting private podcasts.",
+    "intent": "transactional",
+    "branding": "non-branded"
+  }
+]

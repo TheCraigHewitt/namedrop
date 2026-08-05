@@ -1,0 +1,6 @@
+# Copy to .dev.vars for local development. Never commit .dev.vars.
+# In production these are Worker secrets: wrangler secret put <NAME>
+PERPLEXITY_API_KEY=""
+OPENAI_API_KEY=""
+GEMINI_API_KEY=""
+CLORO_API_KEY=""

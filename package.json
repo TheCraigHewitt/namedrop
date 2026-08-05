@@ -1,0 +1,31 @@
+{
+  "name": "namedrop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "typecheck": "astro check && tsc --noEmit",
+    "test": "npm run build && vitest run",
+    "test:watch": "vitest",
+    "db:migrate:local": "wrangler d1 migrations apply namedrop --local",
+    "db:migrate:remote": "wrangler d1 migrations apply namedrop --remote",
+    "sync": "node scripts/sync-config.mjs",
+    "sweep": "node scripts/run-sweep.mjs",
+    "deploy": "npm run build && wrangler deploy && npm run sync",
+    "pretypecheck": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.1.6",
+    "astro": "^7.1.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@cloudflare/vitest-pool-workers": "^0.19.0",
+    "typescript": "^5.9.3",
+    "undici": "^8.9.0",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.115.0"
+  }
+}

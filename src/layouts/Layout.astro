@@ -1,0 +1,224 @@
+---
+interface Props {
+  title: string
+  subtitle?: string
+}
+const { title, subtitle } = Astro.props
+const path = Astro.url.pathname
+
+const nav = [
+  { href: '/', label: 'Overview' },
+  { href: '/prompts', label: 'Prompts' },
+  { href: '/runs', label: 'Runs' },
+  { href: '/sources', label: 'Sources' },
+  { href: '/health', label: 'Health' },
+]
+
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href))
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · NameDrop</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="wordmark" href="/">Name<span>Drop</span></a>
+      <nav>
+        {
+          nav.map((item) => (
+            <a href={item.href} class:list={[{ current: isCurrent(item.href) }]}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+
+    <main>
+      <div class="page-head">
+        <h1>{title}</h1>
+        {subtitle && <p class="subtitle">{subtitle}</p>}
+      </div>
+      <slot />
+    </main>
+
+    <style is:global>
+      :root {
+        --bg: #0e1116;
+        --panel: #161b22;
+        --panel-2: #1c232c;
+        --line: #262d38;
+        --ink: #e7edf4;
+        --ink-dim: #93a1b1;
+        --accent: #4f9dff;
+        --self: #ffb84d;
+        --ok: #46c07a;
+        --warn: #e8a13a;
+        --bad: #e5534b;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .masthead {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 0 1.5rem;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .wordmark {
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        padding: 0.9rem 0;
+      }
+      .wordmark span {
+        color: var(--ink-dim);
+        font-weight: 500;
+      }
+      .wordmark:hover {
+        text-decoration: none;
+      }
+
+      .masthead nav {
+        display: flex;
+        gap: 0.25rem;
+        overflow-x: auto;
+      }
+      .masthead nav a {
+        padding: 0.9rem 0.75rem;
+        color: var(--ink-dim);
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+      }
+      .masthead nav a:hover {
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .masthead nav a.current {
+        color: var(--ink);
+        border-bottom-color: var(--accent);
+      }
+
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.75rem 1.5rem 4rem;
+      }
+
+      .page-head {
+        margin-bottom: 1.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        margin: 0.35rem 0 0;
+        color: var(--ink-dim);
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+      .panel > h2 {
+        font-size: 0.95rem;
+        margin: 0;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--line);
+        letter-spacing: 0.01em;
+      }
+      .panel-body {
+        padding: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 0.6rem 1rem;
+        border-bottom: 1px solid var(--line);
+      }
+      th {
+        color: var(--ink-dim);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: var(--panel-2);
+      }
+      td.num,
+      th.num {
+        text-align: right;
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 0.1rem 0.45rem;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--panel-2);
+        color: var(--ink-dim);
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+      .tag.self {
+        border-color: var(--self);
+        color: var(--self);
+      }
+
+      .empty {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--ink-dim);
+      }
+
+      .muted {
+        color: var(--ink-dim);
+      }
+    </style>
+  </body>
+</html>
